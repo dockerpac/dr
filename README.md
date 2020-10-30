@@ -1,66 +1,17 @@
-# TEMPO
+# List of nodes
 
 | NODE        | HOSTNAME           | DATACENTER |
 |:-------------:|:-------------:|:-------------:|
-| *manager1*| ip-172-31-2-202.eu-central-1.compute.internal | dc1
-| *manager2*| ip-172-31-25-32.eu-central-1.compute.internal | dc1
-| *manager3*| ip-172-31-43-229.eu-central-1.compute.internal | dc2
-| *dtr1* | ip-172-31-11-254.eu-central-1.compute.internal | dc1
-| *dtr2* | ip-172-31-23-173.eu-central-1.compute.internal | dc1
-| *dtr3* | ip-172-31-44-29.eu-central-1.compute.internal | dc2
-| *worker1* | ip-172-31-10-46.eu-central-1.compute.internal  | dc1
-| *worker2* | ip-172-31-18-139.eu-central-1.compute.internal  | dc1
-| *worker3* | ip-172-31-33-35.eu-central-1.compute.internal  | dc2
-| *worker4* | ip-172-31-39-74.eu-central-1.compute.internal | dc2
-
-```shell
-# ip-172-31-2-202.eu-central-1.compute.internal (dc1) : 3.123.25.148
-# ip-172-31-25-32.eu-central-1.compute.internal (dc1) : 3.127.243.103
-# ip-172-31-43-229.eu-central-1.compute.internal (dc2) : 3.125.120.162
-
-# ip-172-31-11-254.eu-central-1.compute.internal (dc1) : 18.195.95.234
-# ip-172-31-23-173.eu-central-1.compute.internal (dc1) : 3.122.236.155
-# ip-172-31-44-29.eu-central-1.compute.internal (dc2) : 18.192.198.110
-
-# ip-172-31-10-46.eu-central-1.compute.internal (dc1) : 18.197.96.190
-# ip-172-31-18-139.eu-central-1.compute.internal (dc1) : 18.194.241.2
-# ip-172-31-33-35.eu-central-1.compute.internal (dc2) : 3.121.232.153
-# ip-172-31-39-74.eu-central-1.compute.internal (dc2) : 18.192.206.206
-
-
-# Label nodes
-
-k label node ip-172-31-10-46.eu-central-1.compute.internal \
-      ip-172-31-11-254.eu-central-1.compute.internal \
-             ip-172-31-18-139.eu-central-1.compute.internal \
-             ip-172-31-2-202.eu-central-1.compute.internal \
-             ip-172-31-23-173.eu-central-1.compute.internal \
-             ip-172-31-25-32.eu-central-1.compute.internal \
-        dc=dc1 \
-        node-role.kubernetes.io/dc1=
-
-k label node ip-172-31-33-35.eu-central-1.compute.internal \
-      ip-172-31-39-74.eu-central-1.compute.internal \
-             ip-172-31-43-229.eu-central-1.compute.internal \
-             ip-172-31-44-29.eu-central-1.compute.internal \
-        dc=dc2 \
-        node-role.kubernetes.io/dc2=
-
-k label node ip-172-31-11-254.eu-central-1.compute.internal \
-             ip-172-31-23-173.eu-central-1.compute.internal \
-             ip-172-31-44-29.eu-central-1.compute.internal \
-        node-role.kubernetes.io/dtr=
-
-k label node ip-172-31-10-46.eu-central-1.compute.internal \
-             ip-172-31-18-139.eu-central-1.compute.internal \
-             ip-172-31-33-35.eu-central-1.compute.internal \
-             ip-172-31-39-74.eu-central-1.compute.internal \
-        node-role.kubernetes.io/worker=
-
-k label node ip-172-31-10-46.eu-central-1.compute.internal \
-             ip-172-31-33-35.eu-central-1.compute.internal \
-        node-role.kubernetes.io/ingress=
-```
+| *manager1*| ip-172-31-2-202.eu-central-1.compute.internal | Marcoussis
+| *manager2*| ip-172-31-25-32.eu-central-1.compute.internal | Marcoussis
+| *manager3*| ip-172-31-43-229.eu-central-1.compute.internal | Tigery
+| *dtr1* | ip-172-31-11-254.eu-central-1.compute.internal | Marcoussis
+| *dtr2* | ip-172-31-23-173.eu-central-1.compute.internal | Marcoussis
+| *dtr3* | ip-172-31-44-29.eu-central-1.compute.internal | Tigery
+| *worker1* | ip-172-31-10-46.eu-central-1.compute.internal  | Marcoussis
+| *worker2* | ip-172-31-18-139.eu-central-1.compute.internal  | Marcoussis
+| *worker3* | ip-172-31-33-35.eu-central-1.compute.internal  | Tigery
+| *worker4* | ip-172-31-39-74.eu-central-1.compute.internal | Tigery
 
 TODO : Lancer une application de test type dockerdemo ??
 
@@ -539,7 +490,7 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/con
 
 TODO : check labels
 
-:warning:  :warning: :warning: **It is recommended to wipe the old managers on Marcoussis and to create 2 new nodes.**  
+:warning:  :warning: :warning: **It is recommended to wipe the old managers on Marcoussis and to replace them with 2 new nodes.**  
 
 If you want to use the previous nodes, make sure to wipe datas on them before starting the Docker daemon, as it can create a split brain issue with Etcd, and you will have to start again the DR process from the start.  
 
