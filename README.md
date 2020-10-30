@@ -539,7 +539,8 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/con
 
 TODO : check labels
 
-:warning:  It is recommended to wipe the old managers on Marcoussis and to create 2 new nodes.  
+:warning:  :warning: :warning: **It is recommended to wipe the old managers on Marcoussis and to create 2 new nodes.**  
+
 If you want to use the previous nodes, make sure to wipe datas on them before starting the Docker daemon, as it can create a split brain issue with Etcd, and you will have to start again the DR process from the start.  
 
 - Before adding back the manager to the cluster, you need to wipe the datas in order to prevent it to reconnect automatically to the old etcd/rethinkdb clusters
