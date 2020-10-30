@@ -17,7 +17,7 @@
 # TODO
 ```shell
 # ip-172-31-2-202.eu-central-1.compute.internal (dc1) : 3.123.25.148
-# ip-172-31-25-32.eu-central-1.compute.internal (dc1) : 18.192.69.50
+# ip-172-31-25-32.eu-central-1.compute.internal (dc1) : 3.127.243.103
 # ip-172-31-43-229.eu-central-1.compute.internal (dc2) : 3.125.120.162
 
 # ip-172-31-11-254.eu-central-1.compute.internal (dc1) : 18.195.95.234
@@ -555,3 +555,26 @@ Follow the same procedure as before in the chapter [Check current health of the 
 TODO : Tester un force init swarm et ensuite une restore UCP
 
 TODO : Desactiver admin deploy containers
+
+# Restore Backup
+
+```shell
+
+# manager3
+docker container run --rm -it --security-opt label=disable -v /var/run/docker.sock:/var/run/docker.sock --name ucp $UCP_IMAGE uninstall-ucp --interactive
+docker container run --rm -i --security-opt label=disable -v /var/run/docker.sock:/var/run/docker.sock --name ucp $UCP_IMAGE restore < /tmp/mybackup.tar
+docker node rm <manager1> <manager2>
+
+# dtr3
+docker run -it --rm mirantis/dtr:2.7.8 destroy --ucp-insecure-tls
+
+DTR_IMAGE=mirantis/dtr:2.7.8
+
+UCP_URL=ucp.pac-amberjack.dockerps.io
+USER=totoadmin
+
+docker run -it --rm ${DTR_IMAGE} restore --ucp-node $(hostname) --ucp-insecure-tls --ucp-url $UCP_URL --ucp-username $USER < dtr-metadata-backup-20201030-15_59_32.tar
+
+
+
+```
