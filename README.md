@@ -87,8 +87,8 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/dis
 | [Applications testings](#applications-testings) | 120 minutes |
 | [CHECKPOINT Adding back Marcoussis nodes to the cluster](#checkpoint-adding-back-marcoussis-nodes-to-the-cluster) |  |
 | [Add workers](#add-workers) | 10 minutes |
-| [Add DTR replicas](#add-dtr-replicas) | 20 minutes |
-| [Add managers](#add-managers) | 10 minutes |
+| [Add DTR replicas](#add-dtr-replicas) | 30 minutes |
+| [Add managers](#add-managers) | 20 minutes |
 | [Check current health of the cluster](#check-cluster-health) | 15 minutes |
 | [CHECKPOINT DR complete](#checkpoint-dr-complete) |  |
 
@@ -198,8 +198,7 @@ Every nodes should be in *Ready* state
 DTR_URL=dtr.pac-amberjack.dockerps.io
 UCP_ADMIN=totoadmin
 
-read -sp 'ucp-password: ' UCP_PASSWORD; \
-curl -ksL -u $UCP_ADMIN:$UCP_PASSWORD https://${DTR_URL}/api/v0/meta/cluster_status | jq .replica_health
+read -sp 'ucp-password: ' UCP_PASSWORD; curl -ksL -u $UCP_ADMIN:$UCP_PASSWORD https://${DTR_URL}/api/v0/meta/cluster_status | jq .replica_health
 ```
 
 ## Check Deployed apps health
@@ -369,7 +368,9 @@ systemctl restart docker
 - Check the UCP API
 
 ```shell
-curl -ks https://localhost/_ping
+UCP_URL=ucp.pac-amberjack.dockerps.io
+
+curl -ks https://${UCP_URL}/_ping
 ```
 
 - Using a client bundle, check that UCP and Kubernetes responds
@@ -384,10 +385,9 @@ kubectl get nodes
 
 
 TODO :  
-APPS will be rescheduled after 5 minutes
-Nginx replica will stay Pending because of PodAntiaffinity on Datacenter
-Apps replicas will be scheduled on workers of DC2
-Stuck in ContainerCreating if DTR is not available
+APPS will be rescheduled after 5 minutes.  
+Nginx replica will stay Pending because of PodAntiaffinity on Datacenter.  
+Apps replicas will be scheduled on workers of DC2 but can be stuck in ContainerCreating state if image is not present locally and DTR is not available.
 
 [Back to the chronogram](#chronogram)
 
@@ -453,7 +453,7 @@ docker image pull <IMAGE ON DTR>
 # Add workers
 https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/configure/join-nodes/join-linux-nodes-to-cluster.html
 
-To add back the worker nodes to the cluster, just the VMs and they will automatically join the cluster.  
+To add back the worker nodes to the cluster, just start the VMs and they will automatically join the cluster.  
 Check the status of the nodes using a client bundle:
 ```shell
 cd <BUNDLE DIR>
@@ -462,7 +462,8 @@ source env.sh
 kubectl get nodes
 docker node ls
 ```
-Sometimes the nodes will take some time to appear as Ready. You may need to restart ucp-swarm-manager container on the manager to update swarm classic inventory
+Sometimes the nodes will take some time to appear as Ready.  
+You may need to restart ucp-swarm-manager container on the manager to update swarm classic inventory
 
 On the remaining manager :
 ```shell
@@ -487,9 +488,9 @@ docker container rm -f $(docker ps -aq --filter "name=dtr-")
 docker volume rm $(docker volume ls -q --filter "name=dtr-")
 ```
 
-- Join new replica to cluster
+- Join new replicas to cluster
 
-On each dtr node on Marcoussis :
+Execute these commands on the DTR replica on Tigery : 
 ```shell
 DTR_DOCKERHUB=$(docker ps --filter "name=dtr-registry" --format "{{.Image}}" | cut -d"/" -f1)
 DTR_VERSION=$(docker ps --filter "name=dtr-registry" --format "{{.Image}}" | cut -d":" -f2)
@@ -498,8 +499,12 @@ DTR_IMAGE=${DTR_DOCKERHUB}/dtr:${DTR_VERSION}
 UCP_URL=ucp.pac-amberjack.dockerps.io
 USER=totoadmin
 
-docker run -it --rm ${DTR_IMAGE} join --ucp-node $(hostname) --ucp-insecure-tls --ucp-url $UCP_URL --ucp-username $USER
+# Replace <dtrX> with tne name of the node you want to add
+docker run -it --rm ${DTR_IMAGE} join --ucp-node <dtr1> --ucp-insecure-tls --ucp-url $UCP_URL --ucp-username $USER
+# Wait for the replica to join the cluster, then join the last replica
+docker run -it --rm ${DTR_IMAGE} join --ucp-node <dtr2> --ucp-insecure-tls --ucp-url $UCP_URL --ucp-username $USER
 ```
+
 
 [Back to the chronogram](#chronogram)
 
@@ -508,7 +513,8 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/con
 
 TODO : check labels
 
-WARNING : It is recommended to wipe the old managers on Marcoussis and to create 2 new managers
+:warning:  It is recommended to wipe the old managers on Marcoussis and to create 2 new nodes.  
+If you want to use the previous nodes, make sure to wipe datas on them before starting the Docker daemon, as it can create a split brain issue with Etcd, and you will have to start again the DR process from the start.  
 
 - Before adding back the manager to the cluster, you need to wipe the datas in order to prevent it to reconnect automatically to the old etcd/rethinkdb clusters
 
@@ -526,9 +532,9 @@ Execute the following command on the manager on Tigery in order to generate a jo
 docker swarm join-token manager
 ```
 
-Execute the following command 
+Paste the command on the node you want to join
 ```shell
-docker swarm join as manager
+docker swarm join <TOKEN HOST:IP>
 ```
 
 Wait until the manager has fully joind the cluster and is healthy, then repeat operation for the second manager
