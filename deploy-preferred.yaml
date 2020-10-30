@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockerdemo-preferred
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dockerdemo-preferred
+  template:
+    metadata:
+      labels:
+        app: dockerdemo-preferred
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - dockerdemo-preferred
+              topologyKey: dc
+      containers:
+      - name: dockerdemo
+        image: dockerpac/docker-demo
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dockerdemo-preferred
+  labels:
+    app: dockerdemo-preferred
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: dockerdemo-preferred
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: dr
+  name: dockerdemo-preferred
+  labels:
+    app: dockerdemo-preferred
+spec:
+  rules:
+  - host: dockerdemo-preferred.k8s.pac-amberjack.dockerps.io
+    http:
+      paths:
+      - backend:
+          serviceName: dockerdemo-preferred
+          servicePort: 8080
+        path: /

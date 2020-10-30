@@ -1,0 +1,85 @@
+controller:
+  scope:
+    enabled: true
+  ingressClass: dr
+  replicaCount: 2
+  minAvailable: 1
+  image:
+    allowPrivilegeEscalation: true
+  resources:
+   limits:
+     cpu: 100m
+     memory: 200Mi
+   requests:
+     cpu: 50m
+     memory: 200Mi
+  affinity:
+    # An example of required pod anti-affinity
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/ingress
+            operator: Exists
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - ingress-nginx
+        topologyKey: "kubernetes.io/hostname"
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - ingress-nginx
+        topologyKey: "dc"
+  service:
+    type: "NodePort"
+    #externalTrafficPolicy: "Local"
+    nodePorts:
+      http: 35080
+      https: 35443
+  admissionWebhooks:
+    enabled: false
+    patch:
+      enabled: false
+  patch:
+    enabled: false
+  defaultBackend:
+    enabled: false
+  metrics:
+    enabled: false
+    prometheusRule:
+      enabled: true
+      additionalLabels:
+        app: prometheus-operator
+        release: tutu
+      rules:
+        # These are just examples rules, please adapt them to your needs
+         - alert: TooMany500s
+           expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"5.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
+           for: 1m
+           labels:
+             severity: critical
+           annotations:
+             description: Too many 5XXs
+             summary: More than 5% of the all requests did return 5XX, this require your attention
+         - alert: TooMany400s
+           expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"4.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
+           for: 1m
+           labels:
+             severity: critical
+           annotations:
+             description: Too many 4XXs
+             summary: More than 5% of the all requests did return 4XX, this require your attention
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: tutu
+rbac:
+  create: true
+  scope: true
