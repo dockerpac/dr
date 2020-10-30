@@ -256,9 +256,10 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/mon
 
 https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/disaster-recovery.html
 
-Connect on remaining manager
 ## Restore Swarm quorum
-Force a new Swarm cluster, and force a new Swarm snapshot to happen
+Force a new Swarm cluster, and force a new Swarm snapshot to happen.  
+
+Execute these commands on the remaining manager on Tigery :
 ```shell
 # TODO : Check existing parameters ???
 docker swarm init --force-new-cluster
@@ -286,6 +287,7 @@ docker service ls
 ```
 
 ## Restore etcd quorum
+Execute these commands on the remaining manager on Tigery :
 ```shell
 UCP_VERSION=$(docker ps --filter "name=ucp-proxy" --format "{{.Image}}" | cut -d":" -f2)
 UCP_DOCKERHUB=$(docker ps --filter "name=ucp-proxy" --format "{{.Image}}" | cut -d"/" -f1)
@@ -323,7 +325,9 @@ Etcd cluster has now only 1 replica
 
 ## Restore rethinkdb quorum
 
-- Restore quorum
+- Restore quorum  
+
+Execute these commands on the remaining manager on Tigery :
 ```shell
 UCP_VERSION=$(docker ps --filter "name=ucp-proxy" --format "{{.Image}}" | cut -d":" -f2)
 UCP_DOCKERHUB=$(docker ps --filter "name=ucp-proxy" --format "{{.Image}}" | cut -d"/" -f1)
