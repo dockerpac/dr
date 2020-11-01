@@ -28,6 +28,7 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/dis
 | [1. Take a support dump](#1-take-a-support-dump) | 5 minutes |
 | [2. Check available backups](#2-check-available-backups) | 15 minutes |
 | [3. Check current health of the cluster](#3-check-current-health-of-the-cluster) | 15 minutes |
+| [:arrow_forward: **CHECKPOINT** Start of DR](#checkpoint-start-of-dr) |  |
 | [4. Communicate start of DR](#4-communicate-start-of-DR) | 5 minutes |
 | [5. Stop VMs in Datacenter dc1](#5-stop-vms-in-datacenter-dc1) | 15 minutes |
 | [:arrow_forward: **CHECKPOINT** No rollback possible beyond this point](#checkpoint-no-rollback-possible-beyond-this-point) |  |
@@ -157,6 +158,10 @@ read -sp 'ucp-password: ' UCP_PASSWORD; curl -ksL -u $UCP_ADMIN:$UCP_PASSWORD ht
 ## Check Deployed apps health
 
 TODO : check dockerdemo health ?
+
+[Back to the chronogram](#chronogram)
+
+# CHECKPOINT Start of DR
 
 [Back to the chronogram](#chronogram)
 
