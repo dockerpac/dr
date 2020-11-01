@@ -526,8 +526,7 @@ Wait until the manager has fully joind the cluster and is healthy, then repeat o
 
 # 13. Check cluster health
 
-Follow the same procedure as before in the chapter [Check current health of the cluster
-](#check-current-health-of-the-cluster)
+Follow the same procedure as before in the chapter [3. Check current health of the cluster](#3-check-current-health-of-the-cluster)
 
 [Back to the chronogram](#chronogram)
 
