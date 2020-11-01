@@ -1,19 +1,21 @@
+TODO : Use an app test like dockerdemo ?
+TODO : Rollback procedure using restore
+
 # List of nodes
 
 | NODE        | HOSTNAME           | DATACENTER |
 |:-------------:|:-------------:|:-------------:|
-| *manager1*| ip-172-31-2-202.eu-central-1.compute.internal | Marcoussis
-| *manager2*| ip-172-31-25-32.eu-central-1.compute.internal | Marcoussis
-| *manager3*| ip-172-31-43-229.eu-central-1.compute.internal | Tigery
-| *dtr1* | ip-172-31-11-254.eu-central-1.compute.internal | Marcoussis
-| *dtr2* | ip-172-31-23-173.eu-central-1.compute.internal | Marcoussis
-| *dtr3* | ip-172-31-44-29.eu-central-1.compute.internal | Tigery
-| *worker1* | ip-172-31-10-46.eu-central-1.compute.internal  | Marcoussis
-| *worker2* | ip-172-31-18-139.eu-central-1.compute.internal  | Marcoussis
-| *worker3* | ip-172-31-33-35.eu-central-1.compute.internal  | Tigery
-| *worker4* | ip-172-31-39-74.eu-central-1.compute.internal | Tigery
+| *manager1*| ip-172-31-2-202.eu-central-1.compute.internal | dc1
+| *manager2*| ip-172-31-25-32.eu-central-1.compute.internal | dc1
+| *manager3*| ip-172-31-43-229.eu-central-1.compute.internal | dc2
+| *dtr1* | ip-172-31-11-254.eu-central-1.compute.internal | dc1
+| *dtr2* | ip-172-31-23-173.eu-central-1.compute.internal | dc1
+| *dtr3* | ip-172-31-44-29.eu-central-1.compute.internal | dc2
+| *worker1* | ip-172-31-10-46.eu-central-1.compute.internal  | dc1
+| *worker2* | ip-172-31-18-139.eu-central-1.compute.internal  | dc1
+| *worker3* | ip-172-31-33-35.eu-central-1.compute.internal  | dc2
+| *worker4* | ip-172-31-39-74.eu-central-1.compute.internal | dc2
 
-TODO : Lancer une application de test type dockerdemo ??
 
 # Reference documentation
 
@@ -27,21 +29,20 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/dis
 | [2. Check available backups](#2-check-available-backups) | 15 minutes |
 | [3. Check current health of the cluster](#3-check-current-health-of-the-cluster) | 15 minutes |
 | [4. Communicate start of DR](#4-communicate-start-of-DR) | 5 minutes |
-| [5. Stop VMs in Datacenter Marcoussis](#5-stop-vms-in-datacenter-marcoussis) | 15 minutes |
+| [5. Stop VMs in Datacenter dc1](#5-stop-vms-in-datacenter-dc1) | 15 minutes |
 | [:arrow_forward: **CHECKPOINT** No rollback possible beyond this point](#checkpoint-no-rollback-possible-beyond-this-point) |  |
 | [6. Restore UCP quorum](#6-restore-ucp-quorum) | 10 minutes |
 | [7. Restore DTR quorum](#7-restore-dtr-quorum) | 10 minutes |
-| [:arrow_forward: **CHECKPOINT** UCP and DTR are UP on Tigery](#checkpoint-ucp-and-dtr-are-up-on-tigery) |  |
-| [8. Communicate end of failover to Tigery](#8-communicate-end-of-failover-to-tigery) | 5 minutes |
+| [:arrow_forward: **CHECKPOINT** UCP and DTR are UP on dc2](#checkpoint-ucp-and-dtr-are-up-on-dc2) |  |
+| [8. Communicate end of failover to dc2](#8-communicate-end-of-failover-to-dc2) | 5 minutes |
 | [9. Applications testings](#9-applications-testings) | 120 minutes |
-| [:arrow_forward: **CHECKPOINT** Adding back Marcoussis nodes to the cluster](#checkpoint-adding-back-marcoussis-nodes-to-the-cluster) |  |
+| [:arrow_forward: **CHECKPOINT** Adding back dc1 nodes to the cluster](#checkpoint-adding-back-marcoussis-nodes-to-the-cluster) |  |
 | [10. Add workers](#10-add-workers) | 10 minutes |
 | [11. Add DTR replicas](#11-add-dtr-replicas) | 30 minutes |
 | [12. Add managers](#12-add-managers) | 20 minutes |
 | [13. Check current health of the cluster](#13-check-cluster-health) | 15 minutes |
 | [:arrow_forward: **CHECKPOINT** DR complete](#checkpoint-dr-complete) |  |
 
-TODO : ROLLBACK PROCEDURE USING RESTORE
 
 # 1. Take a support dump
 
@@ -65,7 +66,7 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/dis
 
 https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/disaster-recovery/backup-ucp.html
 
-If you need to take a backup, connect to the manager on Tigery :  
+If you need to take a backup, connect to the manager on dc2 :  
 
 ```shell
 UCP_DOCKERHUB=$(docker ps --filter "name=ucp-proxy" --format "{{.Image}}" | cut -d"/" -f1)
@@ -89,7 +90,7 @@ docker container run \
 
 https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/dtr/dtr-admin/disaster-recovery/create-a-backup.html
 
-If you need to take a backup, connect to the DTR replica on Tigery :
+If you need to take a backup, connect to the DTR replica on dc2 :
 
 ```shell
 DTR_DOCKERHUB=$(docker ps --filter "name=dtr-registry" --format "{{.Image}}" | cut -d"/" -f1)
@@ -155,7 +156,7 @@ read -sp 'ucp-password: ' UCP_PASSWORD; curl -ksL -u $UCP_ADMIN:$UCP_PASSWORD ht
 
 ## Check Deployed apps health
 
-TODO : check dockerdemo ?
+TODO : check dockerdemo health ?
 
 [Back to the chronogram](#chronogram)
 
@@ -163,9 +164,9 @@ TODO : check dockerdemo ?
 
 [Back to the chronogram](#chronogram)
 
-# 5. Stop VMs in Datacenter Marcoussis
+# 5. Stop VMs in Datacenter dc1
 
-Stop vms in the table [List of Nodes](#list-of-nodes) that are in Datacenter Marcoussis
+Stop vms in the table [List of Nodes](#list-of-nodes) that are in Datacenter dc1
 
 After the shutdown :
 
@@ -199,7 +200,7 @@ Password:
 Error response from daemon: Get https://dtr.pac-amberjack.dockerps.io/v2/: received unexpected HTTP status: 500 Internal Server Error
 ```
 
-- Replicas of the apps running on Marcoussis are UP
+- Replicas of the apps running on dc1 are UP
 
 TODO : check dockerdemo health ?
 
@@ -219,7 +220,7 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/dis
 
 Force a new Swarm cluster, and force a new Swarm snapshot to happen.  
 
-Execute these commands on the remaining manager on Tigery :
+Execute these commands on the remaining manager on dc2 :
 
 ```shell
 # TODO : Check existing parameters ???
@@ -251,7 +252,7 @@ docker service ls
 
 ## Restore etcd quorum
 
-Execute these commands on the remaining manager on Tigery :
+Execute these commands on the remaining manager on dc2 :
 
 ```shell
 UCP_VERSION=$(docker ps --filter "name=ucp-proxy" --format "{{.Image}}" | cut -d":" -f2)
@@ -292,7 +293,7 @@ Etcd cluster has now only 1 replica
 
 - Restore quorum  
 
-Execute these commands on the remaining manager on Tigery :
+Execute these commands on the remaining manager on dc2 :
 
 ```shell
 UCP_VERSION=$(docker ps --filter "name=ucp-proxy" --format "{{.Image}}" | cut -d":" -f2)
@@ -354,8 +355,10 @@ kubectl get nodes
 
 TODO :  
 APPS will be rescheduled after 5 minutes.  
-Nginx replica will stay Pending because of PodAntiaffinity on Datacenter.  
-Apps replicas will be scheduled on workers of DC2 but can be stuck in ContainerCreating state if image is not present locally and DTR is not available.
+
+Nginx replica will stay *Pending* because of PodAntiaffinity on Datacenter.  
+
+Apps replicas will be scheduled on workers of **dc2** but can be stuck in ContainerCreating state if image is not present locally and DTR is not available.
 
 [Back to the chronogram](#chronogram)
 
@@ -365,7 +368,7 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/dtr/dtr-admin
 
 https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/dtr/dtr-admin/disaster-recovery.html
 
-Connect on remaining DTR node in Tigery
+Connect on remaining DTR node in dc2
 
 ## Restore rethinkdb quorum
 
@@ -404,11 +407,11 @@ docker image pull <IMAGE ON DTR>
 
 [Back to the chronogram](#chronogram)
 
-# CHECKPOINT UCP and DTR are UP on Tigery
+# CHECKPOINT UCP and DTR are UP on dc2
 
 [Back to the chronogram](#chronogram)
 
-# 8. Communicate end of failover to Tigery
+# 8. Communicate end of failover to dc2
 
 [Back to the chronogram](#chronogram)
 
@@ -416,7 +419,7 @@ docker image pull <IMAGE ON DTR>
 
 [Back to the chronogram](#chronogram)
 
-# CHECKPOINT Adding back Marcoussis nodes to the cluster
+# CHECKPOINT Adding back dc1 nodes to the cluster
 
 [Back to the chronogram](#chronogram)
 
@@ -456,7 +459,7 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/dtr/dtr-admin
 
 - Clear old DTR state
 
-On each dtr node on Marcoussis :
+On each dtr node on dc1 :
 
 ```shell
 docker container rm -f $(docker ps -aq --filter "name=dtr-")
@@ -465,7 +468,7 @@ docker volume rm $(docker volume ls -q --filter "name=dtr-")
 
 - Join new replicas to cluster
 
-Execute these commands on the DTR replica on Tigery :  
+Execute these commands on the DTR replica on dc2 :  
 
 ```shell
 DTR_DOCKERHUB=$(docker ps --filter "name=dtr-registry" --format "{{.Image}}" | cut -d"/" -f1)
@@ -490,13 +493,13 @@ https://docs.mirantis.com/docker-enterprise/v3.0/dockeree-products/ucp/admin/con
 
 TODO : check labels
 
-:warning:  :warning: :warning: **It is recommended to wipe the old managers on Marcoussis and to replace them with 2 new nodes.**  
+:warning:  :warning: :warning: **It is recommended to wipe the old managers on dc1 and to replace them with 2 new nodes.**  
 
 If you want to use the previous nodes, make sure to wipe datas on them before starting the Docker daemon, as it can create a split brain issue with Etcd, and you will have to start again the DR process from the start.  
 
 - Before adding back the manager to the cluster, you need to wipe the datas in order to prevent it to reconnect automatically to the old etcd/rethinkdb clusters
 
-Execute the following commands on a manager on Marcoussis
+Execute the following commands on a manager on dc1
 
 ```shell
 rm -rf /var/lib/docker/*
@@ -505,7 +508,7 @@ systemctl start docker
 
 - Join the first node as a manager
 
-Execute the following command on the manager on Tigery in order to generate a join token
+Execute the following command on the manager on dc2 in order to generate a join token
 
 ```shell
 docker swarm join-token manager
