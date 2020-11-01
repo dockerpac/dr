@@ -532,11 +532,7 @@ Follow the same procedure as before in the chapter [3. Check current health of t
 
 # CHECKPOINT DR complete
 
-TODO : Tester un force init swarm et ensuite une restore UCP
-
-TODO : Desactiver admin deploy containers
-
-# Restore Backup
+# TODO : Restore Backup
 
 ```shell
 
