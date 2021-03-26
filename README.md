@@ -325,9 +325,9 @@ docker node update --label-rm com.docker.ucp.agent-pause $NODE_NAME
 Wait a few seconds, then check etcd Health
 
 ```shell
-docker exec -it ucp-kv etcdctl --endpoint https://127.0.0.1:2379 --ca-file /etc/docker/ssl/ca.pem --cert-file /etc/docker/ssl/cert.pem --key-file /etc/docker/ssl/key.pem cluster-health 
+docker exec -it --env ETCDCTL_API=2 ucp-kv etcdctl --endpoint https://127.0.0.1:2379 --ca-file /etc/docker/ssl/ca.pem --cert-file /etc/docker/ssl/cert.pem --key-file /etc/docker/ssl/key.pem cluster-health 
 
-docker exec -it ucp-kv etcdctl --endpoint https://127.0.0.1:2379 --ca-file /etc/docker/ssl/ca.pem --cert-file /etc/docker/ssl/cert.pem --key-file /etc/docker/ssl/key.pem member list 
+docker exec -it --env ETCDCTL_API=2 ucp-kv etcdctl --endpoint https://127.0.0.1:2379 --ca-file /etc/docker/ssl/ca.pem --cert-file /etc/docker/ssl/cert.pem --key-file /etc/docker/ssl/key.pem member list 
 
 ```
 
